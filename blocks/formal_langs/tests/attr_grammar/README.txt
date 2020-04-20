@@ -1,1 +1,0 @@
-A tests for attributed grammar

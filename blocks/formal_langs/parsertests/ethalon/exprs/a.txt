@@ -1,5 +1,0 @@
-[
- (decl_specifiers) {
-  a
- }
-]

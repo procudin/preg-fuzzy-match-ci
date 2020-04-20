@@ -1,8 +1,0 @@
-[
- (decl_specifiers) {
-  (builtintype) {
-   long
-   long
-  }
- }
-]

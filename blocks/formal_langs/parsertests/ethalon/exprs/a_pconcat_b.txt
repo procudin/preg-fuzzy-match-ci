@@ -1,7 +1,0 @@
-[
- (preprocessor_concat) {
-  a
-  ##
-  b
- }
-]

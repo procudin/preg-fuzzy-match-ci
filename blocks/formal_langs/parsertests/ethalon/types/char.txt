@@ -1,7 +1,0 @@
-[
- (decl_specifiers) {
-  (builtintype) {
-   char
-  }
- }
-]

@@ -1,6 +1,0 @@
-[
- (preprocessor_stringify) {
-  #
-  std
- }
-]
