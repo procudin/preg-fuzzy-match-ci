@@ -1,0 +1,10 @@
+*.hg*
+blocks/bulk_edit_mod/
+blocks/role_assign/
+blocks/supervised/
+local/ajaxcategories/
+mod/poasassignment/
+mod/quiz/
+patches/
+question/type/correctwriting/
+question/type/gradertest/

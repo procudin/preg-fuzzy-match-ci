@@ -1,0 +1,28 @@
+<XMLDB PATH="question/type/writeregex/db" VERSION="2013102500" COMMENT="XMLDB file for question type: WriteRegEx" xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <TABLES>
+        <TABLE NAME="qtype_writeregex_options" COMMENT="Table for question type: WriteRegEx">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of question"/>
+                <FIELD NAME="notation" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="native" SEQUENCE="false" COMMENT="Notation of regular expressions used to write answer"/>
+                <FIELD NAME="usecase" SEQUENCE="false" NOTNULL="true" LENGTH="2" TYPE="int"/>
+				<FIELD COMMENT="Class name of the matching engine" NAME="engine" SEQUENCE="false" NOTNULL="true" LENGTH="50" TYPE="char" DEFAULT="preg_php_matcher"/>
+				<FIELD NAME="syntaxtreehinttype" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="syntaxtreehintpenalty" TYPE="float" LENGTH="12" NOTNULL="true" SEQUENCE="false" DECIMALS="7"/>
+                <FIELD NAME="explgraphhinttype" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="explgraphhintpenalty" TYPE="float" LENGTH="12" NOTNULL="true" SEQUENCE="false" DECIMALS="7"/>
+                <FIELD NAME="descriptionhinttype" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="descriptionhintpenalty" TYPE="float" LENGTH="12" NOTNULL="true" SEQUENCE="false" DECIMALS="7"/>
+                <FIELD NAME="teststringshinttype" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="teststringshintpenalty" TYPE="float" LENGTH="12" NOTNULL="true" SEQUENCE="false" DECIMALS="7"/>
+                <FIELD NAME="comparetreepercentage" TYPE="float" LENGTH="12" NOTNULL="true" SEQUENCE="false" DECIMALS="7"/>
+                <FIELD NAME="compareautomatapercentage" TYPE="float" LENGTH="12" NOTNULL="true" SEQUENCE="false" DECIMALS="7"/>
+                <FIELD NAME="comparestringspercentage" TYPE="float" LENGTH="12" NOTNULL="true" SEQUENCE="false" DECIMALS="7"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="fk_question" TYPE="foreign" FIELDS="questionid" REFTABLE="mdl_question" REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+    </TABLES>
+</XMLDB>
