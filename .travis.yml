@@ -25,6 +25,10 @@ env:
  matrix:
   - DB=pgsql
   - DB=mysqli
+  
+# Optionally, it is possible to specify a different Moodle repo to use
+# (git://github.com/moodle/moodle.git is used by default):
+  - MOODLE_REPO=git://github.com/procudin/moodle.git
 
 before_install:
   - phpenv config-rm xdebug.ini
