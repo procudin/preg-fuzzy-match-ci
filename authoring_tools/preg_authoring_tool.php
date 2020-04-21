@@ -200,8 +200,8 @@ abstract class qtype_preg_authoring_tool extends qtype_preg_regex_handler implem
         $json['engine'] = $this->options->engine;
         $json['notation'] = $this->options->notation;
         $json['exactmatch'] = (int)$this->options->exactmatch;
-        $json['approximatematch'] = (int)$this->options->approximatematch;
-        $json['maxtypos'] = (int)$this->options->typolimit;
+        $json['approximatematch'] = (int)(isset($this->options->approximatematch) ? $this->options->approximatematch : 0);
+        $json['maxtypos'] = (int)(isset($this->options->typolimit) ? $this->options->typolimit : 0);
         $json['usecase'] = (int)!$this->options->is_modifier_set(qtype_preg_handling_options::MODIFIER_CASELESS);
         $json['indfirst'] = $this->selectednode !== null ? $this->selectednode->position->indfirst : -2;
         $json['indlast'] = $this->selectednode !== null ? $this->selectednode->position->indlast : -2;
