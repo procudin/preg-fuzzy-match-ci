@@ -3,6 +3,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
+require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 
 class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
 
@@ -27,7 +28,7 @@ class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
      */
     function transition_by_regex($regex, $esca = false, $smallescz = false, $capescz = false, $circumflex = false, $dollar = false, $subexpr = false) {
         $leaf = $this->leaf_by_regex($regex);
-        $transition = new \qtype_preg\fa_transition(0, $leaf, 0);
+        $transition = new \qtype_preg\fa\transition(0, $leaf, 0);
         if ($esca) {
             $transition->mergedafter[] = $this->transition_by_regex('\A');
         }
