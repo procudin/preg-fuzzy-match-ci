@@ -1109,7 +1109,7 @@ class qtype_preg_regex_hint_single_charset_node extends qtype_preg_regex_hint {
                 $tmp->data = $this->non_escaped_characters($tmp->data);
                 $tmp->data = $this->characters_interval_for_single_charset($tmp->data);
                 $tree_root->userinscription = array($tmp);
-                $tree_root->flags[0][0]->data = new qtype_poasquestion\string($tmp->data);
+                $tree_root->flags[0][0]->data = new qtype_poasquestion\utf8_string($tmp->data);
                 $tree_root->subtype = "enumerable_characters";
                 return true;
             }
@@ -1255,8 +1255,8 @@ class qtype_preg_regex_hint_single_alternative_node extends qtype_preg_regex_hin
             if ($characters !== null) {
                 $flag = new qtype_preg_charset_flag;
                 $flag->negative = false;
-//                $characters = new qtype_poasquestion\string($characters);
-                $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion\string($characters));
+//                $characters = new qtype_poasquestion\utf8_string($characters);
+                $flag->set_data(qtype_preg_charset_flag::TYPE_SET, new qtype_poasquestion\utf8_string($characters));
                 $new_node->flags = array(array($flag));
             }
 
@@ -1408,12 +1408,12 @@ class qtype_preg_regex_hint_quant_node extends qtype_preg_regex_hint {
                 if ($tree_root->leftborder === 0 && $tree_root->userinscription[0]->data !== '*') {
                     $tmp = $tree_root->userinscription[0];
                     $tree_root->userinscription = array($tmp);
-                    $tree_root->userinscription[0]->data = new qtype_poasquestion\string('*');
+                    $tree_root->userinscription[0]->data = new qtype_poasquestion\utf8_string('*');
                     return true;
                 } else if ($tree_root->leftborder === 1 && $tree_root->userinscription[0]->data !== '+') {
                     $tmp = $tree_root->userinscription[0];
                     $tree_root->userinscription = array($tmp);
-                    $tree_root->userinscription[0]->data = new qtype_poasquestion\string('+');
+                    $tree_root->userinscription[0]->data = new qtype_poasquestion\utf8_string('+');
                     if ($tree_root->operands[0]->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT
                         || $tree_root->operands[0]->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT) {
                         $se = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING, -1, '', false);
@@ -1427,7 +1427,7 @@ class qtype_preg_regex_hint_quant_node extends qtype_preg_regex_hint {
                 if ($tree_root->leftborder === 0 && $tree_root->rightborder === 1 && $tree_root->userinscription[0]->data !== '?') {
                     $tmp = $tree_root->userinscription[0];
                     $tree_root->userinscription = array($tmp);
-                    $tree_root->userinscription[0]->data = new qtype_poasquestion\string('?');
+                    $tree_root->userinscription[0]->data = new qtype_poasquestion\utf8_string('?');
                     if ($tree_root->operands[0]->type == qtype_preg_node::TYPE_NODE_INFINITE_QUANT
                         || $tree_root->operands[0]->type == qtype_preg_node::TYPE_NODE_FINITE_QUANT) {
                         $se = new qtype_preg_node_subexpr(qtype_preg_node_subexpr::SUBTYPE_GROUPING, -1, '', false);
