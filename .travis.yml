@@ -23,6 +23,7 @@ env:
  global:
   - MOODLE_BRANCH=MOODLE_32_STABLE
   - MOODLE_REPO=git://github.com/procudin/moodle.git
+  - PHPUNIT_IGNORE_PATHS=fa_comparison_test.php,fa_tags_equivalence_test.php
  matrix:
   - DB=pgsql 
   
