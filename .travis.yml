@@ -30,12 +30,14 @@ before_install:
   - phpenv config-rm xdebug.ini
   - nvm install 8.9
   - nvm use 8.9
+  - sudo apt-get install graphviz
   - cd ../..
   - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
 install:
   - moodle-plugin-ci install
+  - moodle-plugin-ci add-config '$CFG->pathtodot = "dot";'
 
 script:
 #  - moodle-plugin-ci phplint
