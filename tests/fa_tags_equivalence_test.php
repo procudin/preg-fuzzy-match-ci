@@ -16,7 +16,7 @@ require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstr
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 require_once($CFG->dirroot . '/question/type/preg/question.php');
 
-class qtype_preg_equivalence_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_equivalence_test extends PHPUnit\Framework\TestCase {
 
     /**
      * Generates array of \qtype_preg\fa\fa_transitions from given fa.

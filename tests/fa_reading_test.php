@@ -5,7 +5,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_nodes.php');
 
-class qtype_preg_fa_reading_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_fa_reading_test extends PHPUnit\Framework\TestCase {
 
     public function test_disclosure_tags() {
         $dotdescription = 'digraph {

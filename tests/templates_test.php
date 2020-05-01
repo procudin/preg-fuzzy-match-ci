@@ -21,7 +21,7 @@ require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_matcher.php');
 require_once($CFG->dirroot . '/question/type/preg/php_preg_matcher/php_preg_matcher.php');
 require_once('override_templates.php');
 
-class qtype_preg_templates_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_templates_test extends PHPUnit\Framework\TestCase {
 
     /**
      * @dataProvider descriptions_provider

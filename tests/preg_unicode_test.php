@@ -5,7 +5,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
-class qtype_preg_unicode_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_unicode_test extends PHPUnit\Framework\TestCase {
 
     private $mincode;
     private $maxcode;

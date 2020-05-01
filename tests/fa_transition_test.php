@@ -5,7 +5,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/preg_regex_handler.php');
 
-class qtype_preg_fa_transition_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_fa_transition_test extends PHPUnit\Framework\TestCase {
 
     function create_lexer($regex) {
         $options = new qtype_preg_handling_options();

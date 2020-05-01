@@ -14,7 +14,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_simplification_tool.php');
 
-class qtype_preg_simplification_tool_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_simplification_tool_test extends PHPUnit\Framework\TestCase {
 
     /*public function test_1() {
         $stooloptions = new qtype_preg_simplification_tool_options();

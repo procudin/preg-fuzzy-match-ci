@@ -7,7 +7,7 @@ require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstr
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_unicode.php');
 
-class qtype_preg_unicode_huge_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_unicode_huge_test extends PHPUnit\Framework\TestCase {
 
     function create_lexer($regex) {
         StringStreamController::createRef('regex', $regex);

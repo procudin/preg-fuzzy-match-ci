@@ -14,7 +14,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_syntax_tree_tool.php');
 
-class qtype_preg_tool_syntax_tree_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_tool_syntax_tree_test extends PHPUnit\Framework\TestCase {
 
     function get_node($str) {
         $options = new qtype_preg_handling_options();

@@ -10,7 +10,7 @@ require_once($CFG->dirroot . '/question/type/preg/preg_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_matcher.php');
 
 
-/*class qtype_preg_fa_intersection_test extends PHPUnit_Framework_TestCase {
+/*class qtype_preg_fa_intersection_test extends PHPUnit\Framework\TestCase {
     // --------------------- Merge wordbreaks tests ------------------------
 
     public function test_word_starts() {

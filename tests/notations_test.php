@@ -16,7 +16,7 @@ require_once($CFG->dirroot . '/question/type/preg/question.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_notations.php');
 
 
-class qtype_preg_notations_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_notations_test extends PHPUnit\Framework\TestCase {
 
     //Test conversion from native to PCRE strict notation.
     /*public function test_PCRE_from_native() {

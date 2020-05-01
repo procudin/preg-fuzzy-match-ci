@@ -16,7 +16,7 @@ ob_start();
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_regex_testing_tool_loader.php');
 ob_end_clean();
 
-class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_tool_testing_test extends PHPUnit\Framework\TestCase {
 
     function test_loader_no_selection() {
         $_GET['regex'] = 'a';

@@ -18,7 +18,7 @@ require_once($CFG->dirroot . '/question/type/poasquestion/stringstream/stringstr
 require_once($CFG->dirroot . '/question/type/preg/preg_lexer.lex.php');
 require_once('override_templates.php');
 
-class qtype_preg_nodes_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_nodes_test extends PHPUnit\Framework\TestCase {
 
     function create_lexer($regex, $options = null) {
         if ($options === null) {

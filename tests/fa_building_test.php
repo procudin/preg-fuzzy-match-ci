@@ -7,7 +7,7 @@ require_once($CFG->dirroot . '/question/type/preg/fa_matcher/fa_matcher.php');
 
 //$CFG->pathtodot = '/usr/bin/dot';
 
-class qtype_preg_fa_building_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_fa_building_test extends PHPUnit\Framework\TestCase {
 
     protected $dir;
 

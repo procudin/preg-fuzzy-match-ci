@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/question/type/preg/question.php');
 
-class qtype_preg_question_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_question_test extends PHPUnit\Framework\TestCase {
 
     protected $testquestion;
     protected $subexprquestion;

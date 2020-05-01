@@ -16,7 +16,7 @@ require_once($CFG->dirroot . '/question/type/preg/question.php');
 require_once($CFG->dirroot . '/question/type/preg/preg_hints.php');
 
 
-class qtype_preg_hints_test extends PHPUnit_Framework_TestCase {
+class qtype_preg_hints_test extends PHPUnit\Framework\TestCase {
 
     protected $testquestion;
 

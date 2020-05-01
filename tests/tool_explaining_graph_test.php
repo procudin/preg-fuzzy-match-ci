@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explainin
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_graph_nodes.php');
 require_once($CFG->dirroot . '/question/type/preg/authoring_tools/preg_explaining_graph_misc.php');
 
-class qtype_preg_tool_explaining_graph_test extends PHPUnit_Framework_TestCase
+class qtype_preg_tool_explaining_graph_test extends PHPUnit\Framework\TestCase
 {
 
     /**

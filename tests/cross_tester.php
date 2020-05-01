@@ -60,7 +60,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-abstract class qtype_preg_cross_tester extends PHPUnit_Framework_TestCase {
+abstract class qtype_preg_cross_tester extends PHPUnit\Framework\TestCase {
 
     // Different sources of test data.
     const TAG_FROM_NFA           = 0x0001;
