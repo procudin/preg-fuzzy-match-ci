@@ -11,7 +11,7 @@ class qtype_preg_fa_building_test extends PHPUnit\Framework\TestCase {
 
     protected $dir;
 
-    public function __construct() {
+    public function setUp() {
         global $CFG;
         if (!defined('QTYPE_PREG_TEST_CONFIG_PATHTODOT')) {
         } else if ($CFG->pathtodot === '') {

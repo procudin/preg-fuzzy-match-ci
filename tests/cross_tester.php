@@ -159,7 +159,7 @@ abstract class qtype_preg_cross_tester extends PHPUnit\Framework\TestCase {
         return false;
     }
 
-    public function __construct() {
+    public function setUp() {
         $this->testdataobjects = array();
         $this->doextrachecks = false;       // TODO: control this field from outside.
         $this->blacklist = array();
