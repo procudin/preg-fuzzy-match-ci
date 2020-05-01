@@ -24,7 +24,7 @@ env:
   - MOODLE_BRANCH=MOODLE_32_STABLE
   - MOODLE_REPO=git://github.com/procudin/moodle.git
   - IGNORE_NAMES=fa_comparison_test.php,fa_tags_equivalence_test.php
-  - PHPUNIT_IGNORE_PATHS=$IGNORE_NAMES
+  - PHPUNIT_IGNORE_NAMES=$IGNORE_NAMES
  matrix:
   - DB=pgsql 
   
