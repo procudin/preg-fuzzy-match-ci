@@ -399,7 +399,7 @@ class qtype_preg_fa_leaf extends qtype_preg_fa_node {
 
     public function accept($options) {
         if ($options->approximatematch && ($this->pregnode->type == qtype_preg_node::TYPE_LEAF_BACKREF/*
-                                          || $this->pregnode->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL && !$this->pregnode->isrecursive)*/) {
+                                          || $this->pregnode->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL && !$this->pregnode->isrecursive*/)) {
             return get_string('backreforrecursionforapproximate', 'qtype_preg');
         }
         return true;
