@@ -23,7 +23,8 @@ env:
  global:
   - MOODLE_BRANCH=MOODLE_32_STABLE
   - MOODLE_REPO=git://github.com/procudin/moodle.git
-  - PHPUNIT_IGNORE_PATHS=fa_comparison_test.php,fa_tags_equivalence_test.php
+  - IGNORE_NAMES=fa_comparison_test.php,fa_tags_equivalence_test.php
+  - PHPUNIT_IGNORE_PATHS=$IGNORE_NAMES
  matrix:
   - DB=pgsql 
   
@@ -39,6 +40,7 @@ before_install:
 install:
   - moodle-plugin-ci install
   - moodle-plugin-ci add-config '$CFG->pathtodot = "dot";'
+  - moodle-plugin-ci add-config '$CFG->qtype_writregex_groups_pairs_limit = 10000;'
 
 script:
 #  - moodle-plugin-ci phplint
