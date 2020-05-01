@@ -25,7 +25,7 @@
 /**
  * This object extends M.poasquestion_text_and_button with onfirstpresscallback()
  * function and oneachpresscallback()
- */ 
+ */
 define(['jquery', 'qtype_poasquestion/poasquestion_text_and_button'], (function ($) {
 
     var self = {
@@ -490,7 +490,7 @@ define(['jquery', 'qtype_poasquestion/poasquestion_text_and_button'], (function 
             var textRange=part_select_mouse.getRangeAt(0);
 
             var length_text=text_selected_mouse.length;
-            
+
             //mouse from right to left
             //check anchor node
             if (self.check_keyword(anchorNode) && text_selected_mouse[length_text-1]==" "&&part_select_mouse.anchorOffset==1) {
@@ -1255,7 +1255,7 @@ define(['jquery', 'qtype_poasquestion/poasquestion_text_and_button'], (function 
         $("svg .node", self.tree_img()).unbind('click', self.tree_node_clicked);
         self.graph_img().unbind('click', self.graph_node_misclicked);
         $("svg .node", self.graph_img()).unbind('click', self.graph_node_clicked); // TODO - idea says that this is bad :c
-        self.desc_hnd().unbind('mouseup',self.description_node_clicked); 
+        self.desc_hnd().unbind('mouseup',self.description_node_clicked);
 
         // Check the cache.
         var k = self.cache_key_for_explaining_tools(indfirst, indlast);
@@ -1314,6 +1314,11 @@ define(['jquery', 'qtype_poasquestion/poasquestion_text_and_button'], (function 
                 approximatematch: $('#id_approximatematch_auth :selected').val(),
                 maxtypos: $('#id_maxtypos_auth').val(),
                 usecase: $('#id_usecase_auth :selected').val(),
+                // hintpossible enables mode, which if the selected matcher contains errors, testing tool displays errors,
+                // otherwise it switches to the php matcher at the background.
+                // First one should be enabled for regex constructor mod, second - for question editor
+                // '/question.php' indicates whether it is question editor
+                hintpossible: window.location.href.indexOf('/question.php') === -1 ? 1 : 0,
                 indfirst: indfirst,
                 indlast: indlast,
                 strings: $('#id_regex_match_text').val(),

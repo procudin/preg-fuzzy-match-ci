@@ -30,8 +30,8 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $_GET['ajax'] = 1;
 
         $json = qtype_preg_get_json_array();
-        $this->assertEquals($json['indfirst'], -2);
-        $this->assertEquals($json['indlast'], -2);
+        $this->assertEquals(-2, $json['indfirst']);
+        $this->assertEquals(-2, $json['indlast']);
     }
 
     function test_loader_selection() {
@@ -46,8 +46,8 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $_GET['ajax'] = 1;
 
         $json = qtype_preg_get_json_array();
-        $this->assertEquals($json['indfirst'], 0);
-        $this->assertEquals($json['indlast'], 0);
+        $this->assertEquals(0, $json['indfirst']);
+        $this->assertEquals(0, $json['indlast']);
     }
 
     function test_loader_exact_selection() {
@@ -62,8 +62,8 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $_GET['ajax'] = 1;
 
         $json = qtype_preg_get_json_array();
-        $this->assertEquals($json['indfirst'], 0);
-        $this->assertEquals($json['indlast'], 0);
+        $this->assertEquals(0, $json['indfirst']);
+        $this->assertEquals(0, $json['indlast']);
     }
 
     function test_correct() {
@@ -77,7 +77,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '<span id="qtype-preg-colored-string"><span class="correct">a</span></span><br /><span id="qtype-preg-colored-string"><span class="correct">b</span></span><br />');
+        $this->assertEquals('<span id="qtype-preg-colored-string"><span class="correct">a</span></span><br /><span id="qtype-preg-colored-string"><span class="correct">b</span></span><br />', $str);
     }
 
     function test_empty_strings() {
@@ -91,7 +91,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '<br />');
+        $this->assertEquals('<br />', $str);
     }
 
     function test_syntax_error() {
@@ -105,7 +105,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '<br />smile! :<b>)</b><br/>Syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position 8.');
+        $this->assertEquals('<br />smile! :<b>)</b><br/>Syntax error: missing opening parenthesis \'(\' for the closing parenthesis in position 8', $str);
     }
 
     function test_accepting_error() {
@@ -119,7 +119,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '<br /><b>(?=some day this will be supported)</b>...<br/>Lookaround assertion in position from 0:0 to 0:34 is not supported by finite state automata.');
+        $this->assertEquals('<br /><b>(?=some day this will be supported)</b>...<br/>Positive lookahead assert in position from 0:0 to 0:34 is not supported by finite state automata.', $str);
     }
 
     function test_empty_regex() {
@@ -133,13 +133,13 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '');
+        $this->assertEquals('', $str);
 
         $strings = "a|b";
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position());
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '');
+        $this->assertEquals('', $str);
     }
 
     function test_selection_dummy() {
@@ -153,7 +153,7 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(0, 0));
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '<span id="qtype-preg-colored-string"><span class="qtype-preg-selection"><span class="correct">a</span></span></span><br />');
+        $this->assertEquals('<span id="qtype-preg-colored-string"><span class="qtype-preg-selection"><span class="correct">a</span></span></span><br />', $str);
     }
 
     function test_selection_grouping() {
@@ -167,17 +167,17 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(1, 6));
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '<span id="qtype-preg-colored-string"><span class="correct">a</span><span class="qtype-preg-selection"><span class="correct">bc</span></span><span class="correct">d</span></span><br />');
+        $this->assertEquals('<span id="qtype-preg-colored-string"><span class="correct">a</span><span class="qtype-preg-selection"><span class="correct">bc</span></span><span class="correct">d</span></span><br />', $str);
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(1, 1));
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '<span id="qtype-preg-colored-string"><span class="correct">a</span><span class="qtype-preg-selection"><span class="correct">bc</span></span><span class="correct">d</span></span><br />');
+        $this->assertEquals('<span id="qtype-preg-colored-string"><span class="correct">a</span><span class="qtype-preg-selection"><span class="correct">bc</span></span><span class="correct">d</span></span><br />', $str);
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(6, 6));
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '<span id="qtype-preg-colored-string"><span class="correct">a</span><span class="qtype-preg-selection"><span class="correct">bc</span></span><span class="correct">d</span></span><br />');
+        $this->assertEquals('<span id="qtype-preg-colored-string"><span class="correct">a</span><span class="qtype-preg-selection"><span class="correct">bc</span></span><span class="correct">d</span></span><br />', $str);
     }
 
     function test_selection_non_preserved() {
@@ -191,17 +191,17 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(1, 4));
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '<span id="qtype-preg-colored-string"><span class="correct">ab</span></span><br />');
+        $this->assertEquals('<span id="qtype-preg-colored-string"><span class="correct">ab</span></span><br />', $str);
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(0, 4));
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '<span id="qtype-preg-colored-string"><span class="qtype-preg-selection"><span class="correct">a</span></span><span class="correct">b</span></span><br />');
+        $this->assertEquals('<span id="qtype-preg-colored-string"><span class="qtype-preg-selection"><span class="correct">a</span></span><span class="correct">b</span></span><br />', $str);
 
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(1, 5));
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '<span id="qtype-preg-colored-string"><span class="correct">a</span><span class="qtype-preg-selection"><span class="correct">b</span></span></span><br />');
+        $this->assertEquals('<span id="qtype-preg-colored-string"><span class="correct">a</span><span class="qtype-preg-selection"><span class="correct">b</span></span></span><br />', $str);
     }
 
     function test_selection_partial_match() {
@@ -215,25 +215,25 @@ class qtype_preg_tool_testing_test extends PHPUnit_Framework_TestCase {
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(2, 5));
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '<span id="qtype-preg-colored-string"><span class="correct">a</span><span class="qtype-preg-selection"><span class="correct">bc</span></span>...</span><br />');
+        $this->assertEquals('<span id="qtype-preg-colored-string"><span class="correct">a</span><span class="qtype-preg-selection"><span class="correct">bc</span></span>...</span><br />', $str);
 
         $strings = 'ab';
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(2, 5));
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '<span id="qtype-preg-colored-string"><span class="correct">a</span><span class="qtype-preg-selection"><span class="correct">b</span></span>...</span><br />');
+        $this->assertEquals('<span id="qtype-preg-colored-string"><span class="correct">a</span><span class="qtype-preg-selection"><span class="correct">b</span></span>...</span><br />', $str);
 
         $strings = 'a';
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(2, 5));
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '<span id="qtype-preg-colored-string"><span class="correct">a</span>...</span><br />');
+        $this->assertEquals('<span id="qtype-preg-colored-string"><span class="correct">a</span>...</span><br />', $str);
 
         $strings = '';
         $tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, new qtype_preg_position(2, 5));
         $json = $tool->generate_json();
         $str = strip_tags($json['regex_test'], '<span><br><b>');
-        $this->assertEquals($str, '<br />');
+        $this->assertEquals('<br />', $str);
     }
 
     function test_approximate_match_with_simple_regex() {

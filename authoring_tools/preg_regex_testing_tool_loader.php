@@ -47,10 +47,11 @@ function qtype_preg_get_json_array() {
     $strings = optional_param('strings', '', PARAM_RAW);
     $approximatematch = (bool)optional_param('approximatematch', '', PARAM_INT);
     $maxtypos = (int)optional_param('maxtypos', '', PARAM_INT);
+    $hintpossible = (int)optional_param('hintpossible', '', PARAM_INT);
 
     $selection = new qtype_preg_position($indfirst, $indlast);
 
-    $regex_testing_tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, $selection, $approximatematch, $maxtypos);
+    $regex_testing_tool = new qtype_preg_regex_testing_tool($regex, $strings, $usecase, $exactmatch, $engine, $notation, $selection, $approximatematch, $maxtypos, $hintpossible);
     return $regex_testing_tool->generate_json();
 }
 

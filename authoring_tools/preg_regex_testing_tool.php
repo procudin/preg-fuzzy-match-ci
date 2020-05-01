@@ -50,8 +50,9 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
     private $question = null;
     private $matcher = null;
     private $errormsgs = null;
+    private $hintpossible = null;
 
-    public function __construct($regex, $strings, $usecase, $exactmatch, $engine, $notation, $selection, $approximatematch = false, $maxtypos = 0) {
+    public function __construct($regex, $strings, $usecase, $exactmatch, $engine, $notation, $selection, $approximatematch = false, $maxtypos = 0, $hintpossible = true) {
         global $CFG;
 
         $this->regex = $regex;
@@ -62,6 +63,7 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         $this->strings = $strings;
         $this->approximatematch = $approximatematch;
         $this->maxtypos = $maxtypos;
+        $this->hintpossible = $hintpossible;
 
         if ($this->regex == '') {
             return;
@@ -79,7 +81,7 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         $matchingoptions->extensionneeded = false; // No need to generate next characters there.
         $matchingoptions->capturesubexpressions = true;
         $matchingoptions->selection = $selection;
-        $matcher = $regular->get_matcher($engine, $regex, $matchingoptions, null, false);
+        $matcher = $regular->get_matcher($engine, $regex, $matchingoptions, null, $this->hintpossible);
         $this->matcher = $matcher;
         if ($matcher->errors_exist()) {
             $this->errormsgs = $matcher->get_error_messages();
@@ -112,6 +114,7 @@ class qtype_preg_regex_testing_tool implements qtype_preg_i_authoring_tool {
         $json['strings'] = $this->strings;
         $json['approximatematch'] = (int)$this->approximatematch;
         $json['maxtypos'] = (int)$this->maxtypos;
+        $json['hintpossible'] = $this->hintpossible ? 1 : 0;
 
         if ($this->regex == '') {
             $json[$this->json_key()] = $this->data_for_empty_regex();
