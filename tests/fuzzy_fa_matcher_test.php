@@ -25,6 +25,7 @@ class qtype_preg_fuzzy_fa_cross_tester extends qtype_preg_cross_tester {
 
     public function setUp()
     {
+        parent::setUp();
         $this->logfilename = __DIR__  . "/errorslog_" . date('Y_m_d___H_i_s') . ".txt";
     }
 
