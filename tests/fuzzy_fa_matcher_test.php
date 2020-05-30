@@ -34,7 +34,8 @@ class qtype_preg_fuzzy_fa_cross_tester extends qtype_preg_cross_tester {
     }
 
     public function accept_regex($regex) {
-        return !preg_match('/\\\\\d+|\*\?|\+\?|\?\?|\}\?|\\\\g|\(\?\=|\(\?\!|\(\?\<\=|\(\?\<\!|\(\?/', $regex);
+        return !preg_match('/\*\?|\+\?|\?\?|\}\?/', $regex);
+        //return !preg_match('/\\\\\d+|\*\?|\+\?|\?\?|\}\?|\\\\g|\(\?\=|\(\?\!|\(\?\<\=|\(\?\<\!|\(\?/', $regex);
     }
 
     protected function serialize_test_data($filename) {
