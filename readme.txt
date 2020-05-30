@@ -8,6 +8,7 @@ Authors:
 4. Syntax tree (authoring tool) - Grigory Terekhov.
 5. Regex description (authoring tool) - Dmitriy Pahomov.
 6. Assertion support - Elena Lepilkina.
+7. Typo detection - Artem Prokudin
 
 Thanks going to:
 * Joseph Rezeau - for been devoted tester of preg question type in several releases;

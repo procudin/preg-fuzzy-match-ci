@@ -330,12 +330,12 @@ class transition {
         // Get ranges from charset
         $ranges = $this->pregleaf->ranges();
 
-        // Merge default ranges with non-blacklist ranges
+        // Merge default ranges with non-blacklist ranges        
         if (\core_text::strlen($blacklist) > 0) {
             $blacklistranges = \qtype_preg_unicode::get_ranges_from_charset(new \qtype_poasquestion\utf8_string($blacklist));
-            $nonblacklistranges = \qtype_preg_unicode::negate_ranges($blacklistranges); // chars out from blacklist - middle priority
+            $nonblacklistranges = \qtype_preg_unicode::negate_ranges($blacklistranges); // chars out from blacklist - middle priority            
             $ranges = \qtype_preg_unicode::intersect_ranges($ranges, $nonblacklistranges);
-        }
+        }      
 
         if (empty($ranges)) {
             return array(\qtype_preg_leaf::NEXT_CHAR_CANNOT_GENERATE, null);
@@ -396,10 +396,10 @@ class transition {
         $originalchar = $originalstr[$pos];
         $originalcode = \core_text::utf8ord($originalchar);
 
-        $desired_ranges = array();
+        $desired_ranges = array();  
         if ($pos < $originalstr->length()) {
             $desired_ranges[] = array(array($originalcode, $originalcode)); // original character - highest priority
-        }
+        }               
         $desired_ranges[] = array(array(0x61, 0x7A));                       // lowercase ASCII characters - high priority
         $desired_ranges[] = array(array(0x21, 0x60), array(0x7B, 0x7F),);   // regular ASCII characters - middle priority
         $desired_ranges[] = array(array(0x20, 0x20));                       // space for \s - lowest priority
@@ -415,7 +415,7 @@ class transition {
         }
 
         $result = new \qtype_poasquestion\utf8_string(\core_text::code2utf8($result_ranges[0][0]));
-
+        
         /*
         // we should prefer lowercase chars
         $resultlower = new \qtype_poasquestion\utf8_string($result->string());

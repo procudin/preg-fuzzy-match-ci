@@ -398,8 +398,8 @@ abstract class qtype_preg_fa_node {
 class qtype_preg_fa_leaf extends qtype_preg_fa_node {
 
     public function accept($options) {
-        if ($options->approximatematch && ($this->pregnode->type == qtype_preg_node::TYPE_LEAF_BACKREF/*
-                                          || $this->pregnode->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL && !$this->pregnode->isrecursive*/)) {
+        if ($options->approximatematch && ($this->pregnode->type == qtype_preg_node::TYPE_LEAF_BACKREF
+                                          || $this->pregnode->type == qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL && !$this->pregnode->isrecursive)) {
             return get_string('backreforrecursionforapproximate', 'qtype_preg');
         }
         return true;
@@ -1109,14 +1109,14 @@ class qtype_preg_fa_node_assert extends qtype_preg_fa_operator {
 
     public function accept($options) {
         // TODO; assertions are not supported yet.
-        if ($this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_PLA ||
+        /*if ($this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_PLA ||
             $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLA ||
             $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_PLB ||
             $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLB) {
             return get_string($this->pregnode->subtype, 'qtype_preg');
         }
-        return true;
-        /*if ($this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLA ||
+        return true;*/
+        if ($this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLA ||
             $this->pregnode->subtype === qtype_preg_node_assert::SUBTYPE_NLB) {
             return get_string($this->pregnode->subtype, 'qtype_preg');
         }
@@ -1124,7 +1124,7 @@ class qtype_preg_fa_node_assert extends qtype_preg_fa_operator {
             $assertname = get_string($this->pregnode->subtype, 'qtype_preg');
             return get_string('mergemodeforassertion', 'qtype_preg', $assertname);
         }
-        return true;*/
+        return true;
     }
 
     protected function create_automaton_inner(&$automaton, &$stack, $transform) {

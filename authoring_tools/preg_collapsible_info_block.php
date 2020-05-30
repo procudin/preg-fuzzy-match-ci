@@ -95,7 +95,7 @@ class qtype_preg_collapsible_info_block extends MoodleQuickForm_textarea {
                     <div class="accordion-heading">
 
                       <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#healp_accordion" href="#healpAccordion" style="display:inline-block;" id="simplification_tool_collapse_btn">
-                        <i id="collapse_block_toggle" style="background-image: url(/moodle/theme/image.php/clean/core/1461098461/t/collapsed); display: inline-block; width: 14px; height: 14px;"></i>
+                        <i id="collapse_block_toggle" style="background-image: url(/moodle/theme/image.php/boost/core/1461098461/t/collapsed); display: inline-block; width: 14px; height: 14px;"></i>
                         <strong>' . get_string('simplification_tool', 'qtype_preg') . '</strong>
                       </a>
 

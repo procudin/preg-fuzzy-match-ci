@@ -123,11 +123,11 @@ $string['maxtypos'] = 'Typo limit';
 $string['maxtypos_help'] = 'Upper typo limit for matching with typo detection. Exceeding the limit leads to incorrect match.';
 $string['typospenalty'] = 'Penalty for each encountered typo';
 $string['typospenalty_help'] = 'Penalty for each encountered typo';
-$string['usehowtofixpichint'] = 'Allow how to fix hiniting (image)';
+$string['usehowtofixpichint'] = 'Allow how to fix hinting (image)';
 $string['usehowtofixpichint_help'] = 'Shows the student, what he should do to make string correct. Typo analysis and typo limit above 0 are required.';
 $string['hinthowtofixpic'] = 'how to fix answer';
-$string['howtofixpichintpenalty'] = 'Penalty for how to fix picture hiniting';
-$string['howtofixpichintpenalty_help'] = 'Penalty for how to fix picture hiniting';
+$string['howtofixpichintpenalty'] = 'Penalty for how to fix picture hinting';
+$string['howtofixpichintpenalty_help'] = 'Penalty for how to fix picture hinting';
 
 $string['backreforrecursionforapproximate'] = 'Backreferences or recursion for match with typo detection';
 $string['lazyquantforapproximate'] = 'Lazy quantifiers for approximate match with typo detection';
@@ -842,3 +842,6 @@ $string['simplification_errors_short_1'] = 'Excess simple assertion "^"';
 $string['simplification_errors_full_1'] = 'Simple assertion "^" is superfluous, since it is not at the beginning of the regular expression';
 $string['simplification_errors_short_2'] = 'Excess simple assertion "$"';
 $string['simplification_errors_full_2'] = 'Simple assertion "$" is superfluous, since it is not at the ending of the regular expression';
+
+// privacy
+$string['privacy:metadata'] = 'The Preg question type do not store user data.';

@@ -843,8 +843,8 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
                 $this_match = isset($stackitems[0]->matches[$i]) ? $stackitems[0]->matches[$i] : null;
                 $other_match = isset($stackitems[1]->matches[$i]) ? $stackitems[1]->matches[$i] : null;
 
-                $this_repetitions_count = count($this_match);
-                $other_repetitions_count = count($other_match);
+                $this_repetitions_count = $this_match ? count($this_match) : 0;
+                $other_repetitions_count = $other_match ? count($other_match) : 0;
 
                 // count === 0 means that there were no attempts at all.
                 if ($this_repetitions_count === 0 && $other_repetitions_count === 0) {

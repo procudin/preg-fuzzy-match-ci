@@ -25,7 +25,7 @@
 /**
  * This object extends M.poasquestion_text_and_button with onfirstpresscallback()
  * function and oneachpresscallback()
- */
+ */ 
 define(['jquery', 'qtype_poasquestion/poasquestion_text_and_button'], (function ($) {
 
     var self = {
@@ -149,7 +149,7 @@ define(['jquery', 'qtype_poasquestion/poasquestion_text_and_button'], (function 
 
                     // Add handlers for the regex testing textarea.
                     $('#id_regex_match_text').keyup(self.textbutton_widget.fix_textarea_rows);
-                    $("#id_regex_match_text").after('<div style="width:100%; display:inline-block">&nbsp;<div style="display:inline-block" id="id_test_regex" class="que"></div></div>');
+                    $("#id_regex_match_text").after('<div>&nbsp;<div style="display:inline-block" id="id_test_regex" class="que"></div></div>');
 
                     // Hide the non-working "displayas".
                     $('#fgroup_id_charset_process_radioset').hide();
@@ -361,9 +361,9 @@ define(['jquery', 'qtype_poasquestion/poasquestion_text_and_button'], (function 
 
     collapse_block_title_clicked : function (e) {
         if ($('#simplification_tool_collapse_btn').hasClass("collapsed")) {
-            $('#collapse_block_toggle').css('background-image', 'url(/moodle/theme/image.php/clean/core/1461098461/t/expanded)');
+            $('#collapse_block_toggle').css('background-image', 'url(/moodle/theme/image.php/boost/core/1461098461/t/expanded)');
         } else {
-            $('#collapse_block_toggle').css('background-image', 'url(/moodle/theme/image.php/clean/core/1461098461/t/collapsed)');
+            $('#collapse_block_toggle').css('background-image', 'url(/moodle/theme/image.php/boost/core/1461098461/t/collapsed)');
         }
     },
 
@@ -490,7 +490,7 @@ define(['jquery', 'qtype_poasquestion/poasquestion_text_and_button'], (function 
             var textRange=part_select_mouse.getRangeAt(0);
 
             var length_text=text_selected_mouse.length;
-
+            
             //mouse from right to left
             //check anchor node
             if (self.check_keyword(anchorNode) && text_selected_mouse[length_text-1]==" "&&part_select_mouse.anchorOffset==1) {
@@ -1255,7 +1255,7 @@ define(['jquery', 'qtype_poasquestion/poasquestion_text_and_button'], (function 
         $("svg .node", self.tree_img()).unbind('click', self.tree_node_clicked);
         self.graph_img().unbind('click', self.graph_node_misclicked);
         $("svg .node", self.graph_img()).unbind('click', self.graph_node_clicked); // TODO - idea says that this is bad :c
-        self.desc_hnd().unbind('mouseup',self.description_node_clicked);
+        self.desc_hnd().unbind('mouseup',self.description_node_clicked); 
 
         // Check the cache.
         var k = self.cache_key_for_explaining_tools(indfirst, indlast);

@@ -344,7 +344,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $subtype = $transition->pregleaf->subtype;
         switch ($subtype) {
             case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
-                if ($curpos == $strlen - 1) {
+                if ($curpos == $strlen - 1 && !$curstate->typos()->contains(qtype_preg_typo::INSERTION, $curpos, "\n")) {
                     // If it's last char - delete it.
                     $curstate->typos()->add(new qtype_preg_typo(qtype_preg_typo::DELETION, $curpos));
                     $result = true;
@@ -363,7 +363,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 }
                 break;
             case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
-                if ($curpos == 1) {
+                if ($curpos == 1 && !$curstate->typos()->contains(qtype_preg_typo::INSERTION, $curpos, "\n")) {
                     // If it's second char - delete it.
                     $curstate->typos()->add(new qtype_preg_typo(qtype_preg_typo::DELETION, 0));
                     $result = true;
@@ -923,9 +923,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $reached = array();
 
         // Get an epsilon-closure of the initial state.
-        foreach ($states['0'] as $state) {
+        foreach ($states['0'] as $number => $state) {
             if ($state !== null) {
-                $reached[] = $state;
+                $reached[$number] = $state;
             }
         }
 
