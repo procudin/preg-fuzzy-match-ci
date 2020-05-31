@@ -344,18 +344,20 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $subtype = $transition->pregleaf->subtype;
         switch ($subtype) {
             case qtype_preg_leaf_assert::SUBTYPE_DOLLAR:
-                if ($curpos == $strlen - 1 && !$curstate->typos()->contains(qtype_preg_typo::INSERTION, $curpos, "\n")) {
-                    // If it's last char - delete it.
-                    $curstate->typos()->add(new qtype_preg_typo(qtype_preg_typo::DELETION, $curpos));
-                    $result = true;
-                    $curstate->length = $curpos;
-                    $curstate->startpos = 0;
-                    $this->after_transition_passed($curstate, $transition, $curpos, 0, $addbacktracks);
-                } else if (!$ismerged) {
-                    // If unmerged, generate \n insertion.
-                    $curstate->typos()->add(new qtype_preg_typo(qtype_preg_typo::INSERTION, $curpos, new utf8_string("\n")));
-                    $result = true;
-                    $this->after_transition_passed($curstate, $transition, $curpos, 0, $addbacktracks);
+                if (!$ismerged) {
+                    // If unmerged, generate \n insertion or delete last char.
+                    if ($curpos == $strlen - 1 && !$curstate->typos()->contains(qtype_preg_typo::INSERTION, $curpos, "\n")) {
+                        // If it's last char - delete it.
+                        $curstate->typos()->add(new qtype_preg_typo(qtype_preg_typo::DELETION, $curpos));
+                        $result = true;
+                        $curstate->length = $curpos;
+                        $curstate->startpos = 0;
+                        $this->after_transition_passed($curstate, $transition, $curpos, 0, $addbacktracks);
+                    } else {
+                        $curstate->typos()->add(new qtype_preg_typo(qtype_preg_typo::INSERTION, $curpos, new utf8_string("\n")));
+                        $result = true;
+                        $this->after_transition_passed($curstate, $transition, $curpos, 0, $addbacktracks);
+                    }
                 } else {
                     // If merged, let char transition generate \n insertion.
                     $result = true;
@@ -363,18 +365,20 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 }
                 break;
             case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
-                if ($curpos == 1 && !$curstate->typos()->contains(qtype_preg_typo::INSERTION, $curpos, "\n")) {
-                    // If it's second char - delete it.
-                    $curstate->typos()->add(new qtype_preg_typo(qtype_preg_typo::DELETION, 0));
-                    $result = true;
-                    $curstate->length = $curpos;
-                    $curstate->startpos = 0;
-                    $this->after_transition_passed($curstate, $transition, $curpos, 0, $addbacktracks);
-                } else if (!$ismerged) {
-                    // If unmerged, generate \n insertion.
-                    $curstate->typos()->add(new qtype_preg_typo(qtype_preg_typo::INSERTION, $curpos, new utf8_string("\n")));
-                    $result = true;
-                    $this->after_transition_passed($curstate, $transition, $curpos, 0, $addbacktracks);
+                if (!$ismerged) {
+                    // If unmerged, generate \n insertion or delete first char.
+                    if ($curpos == 1 && !$curstate->typos()->contains(qtype_preg_typo::INSERTION, $curpos, "\n")) {
+                        // If it's second char - delete it.
+                        $curstate->typos()->add(new qtype_preg_typo(qtype_preg_typo::DELETION, 0));
+                        $result = true;
+                        $curstate->length = $curpos;
+                        $curstate->startpos = 0;
+                        $this->after_transition_passed($curstate, $transition, $curpos, 0, $addbacktracks);
+                    } else {
+                        $curstate->typos()->add(new qtype_preg_typo(qtype_preg_typo::INSERTION, $curpos, new utf8_string("\n")));
+                        $result = true;
+                        $this->after_transition_passed($curstate, $transition, $curpos, 0, $addbacktracks);
+                    }
                 } else {
                     // If merged, let char transition generate \n insertion.
                     $result = true;
