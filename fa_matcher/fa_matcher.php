@@ -424,7 +424,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     protected function match_deletion_pseudotransitions($curstate, $curpos) {
         // Don't try deletion for initial or end state
         //$subpatt = $newstate->matcher->get_ast_root()->subpattern;
-        if (!isset($curstate->stack[0]->matches[0]) || $curstate->is_full()) {
+        if (empty($curstate->stack[0]->matches) || $curstate->is_full()) {
             return null;
         }
 
