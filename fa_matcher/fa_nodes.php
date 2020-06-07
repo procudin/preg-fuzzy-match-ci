@@ -754,9 +754,9 @@ abstract class qtype_preg_fa_node_quant extends qtype_preg_fa_operator {
         if ($this->pregnode->possessive) {
             return get_string('possessivequant', 'qtype_preg');
         }
-        if ($options->approximatematch && $this->pregnode->lazy) {
-            return get_string('lazyquantforapproximate', 'qtype_preg');
-        }
+        //if ($options->approximatematch && $this->pregnode->lazy) {
+        //   return get_string('lazyquantforapproximate', 'qtype_preg');
+        //}
         return true;
     }
 
