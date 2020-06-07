@@ -62,9 +62,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     // Set of chars that cant be used as a typo.
     protected $typoblacklist = '';
 
-    // Transpose pseudotransitions, array(fromstate => array(tostate => array(transitions))).
-    protected $transposepseudotransitions = [];
-
     public function name() {
         return 'fa_matcher';
     }
@@ -141,11 +138,12 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
     }
 
-    protected function create_fa_exec_stack_item($subexpr, $state, $startpos, $typos) {
+    protected function create_fa_exec_stack_item($subexpr, $state, $stateobj, $startpos) {
         $stackitem = new qtype_preg_fa_stack_item();
         $stackitem->subexpr = $subexpr;
         $stackitem->recursionstartpos = $startpos;
         $stackitem->state = $state;
+        $stackitem->stateobj = $stateobj;
         $stackitem->full = false;
         $stackitem->next_char_flags = 0x00;
         $stackitem->matches = array();
@@ -154,7 +152,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $stackitem->last_transition = null;
         $stackitem->last_match_len = 0;
         $stackitem->last_match_is_partial = false;
-        $stackitem->typos = clone $typos;
         return $stackitem;
     }
 
@@ -169,8 +166,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $result->left = qtype_preg_matching_results::UNKNOWN_CHARACTERS_LEFT;
         $result->extendedmatch = null;
         $result->str = $str;
-        $result->stack = array($this->create_fa_exec_stack_item(0, $state, $startpos, new qtype_preg_typo_container(clone $str)));
+        $result->stack = array($this->create_fa_exec_stack_item(0, $state, $result, $startpos));
         $result->backtrack_states = array();
+        $result->typos = new qtype_preg_typo_container(clone $str);
         if (in_array($state, $this->backtrackstates)) {
             $result->backtrack_states[] = $result;
         }
@@ -367,7 +365,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             case qtype_preg_leaf_assert::SUBTYPE_CIRCUMFLEX:
                 if (!$ismerged) {
                     // If unmerged, generate \n insertion or delete first char.
-                    if ($curpos == 1 && !$curstate->typos()->contains(qtype_preg_typo::INSERTION, $curpos, "\n")) {
+                    if ($curpos == 1) {
                         // If it's second char - delete it.
                         $curstate->typos()->add(new qtype_preg_typo(qtype_preg_typo::DELETION, 0));
                         $result = true;
@@ -441,18 +439,18 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     }
 
 
-    protected function match_recursive_transition_begin($curstate, $transition, $str, $curpos, &$length, &$full, $addbacktracks, $tryapproximate = false, $pseudotype = qtype_preg_typo::SUBSTITUTION) {
-        $result = $this->match_transitions($curstate, $transition->mergedbefore, $str, $curpos, $length, $full, $addbacktracks, $tryapproximate, $pseudotype);
+    protected function match_recursive_transition_begin($curstate, $transition, $str, $curpos, &$length, &$full, $addbacktracks) {
+        $result = $this->match_transitions($curstate, $transition->mergedbefore, $str, $curpos, $length, $full, $addbacktracks);
         if ($full) {
             $this->set_last_transition($result, $transition, $length, false);
         }
         return $result;
     }
 
-    protected function match_recursive_transition_end($newstate, $recursionstartpos, $recursionlength, $str, $curpos, &$length, &$full, $addbacktracks, $tryapproximate = false, $pseudotype = qtype_preg_typo::SUBSTITUTION) {
+    protected function match_recursive_transition_end($newstate, $recursionstartpos, $recursionlength, $str, $curpos, &$length, &$full, $addbacktracks) {
         $this->after_transition_passed($newstate, $newstate->last_transition(), $recursionstartpos, $recursionlength, $addbacktracks);
         $newstate->length -= $recursionlength;
-        return $this->match_transitions($newstate, $newstate->last_transition()->mergedafter, $str, $curpos, $length, $full, $addbacktracks, $tryapproximate, $pseudotype);
+        return $this->match_transitions($newstate, $newstate->last_transition()->mergedafter, $str, $curpos, $length, $full, $addbacktracks);
     }
 
     /**
@@ -518,10 +516,12 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 }
 
                 // This could be the end of a recursive call.
+                $isrecursionend = false;
                 while ($full && $newstate->recursion_level() > 0 && $newstate->is_full()) {
+                    $isrecursionend = true;
                     $topitem = array_pop($newstate->stack);
                     $recursionmatch = $topitem->last_subexpr_match($this->get_options()->mode, $topitem->subexpr);
-                    $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $str, $curpos, $length, $full, $addbacktracks, true, qtype_preg_typo::INSERTION);
+                    $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $str, $curpos, $length, $full, $addbacktracks);
                 }
 
                 if (!$full) {
@@ -535,7 +535,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                      : \qtype_preg\fa\transition::GREED_GREEDY;
                 if (!isset($result[$key][$number]) || $newstate->leftmost_longest($result[$key][$number])) {
                     $result[$key][$number] = $newstate;
-                    if ($key != \qtype_preg\fa\transition::GREED_LAZY && !($isinsertion && $transition->from === $transition->to)) {
+                    if ($key != \qtype_preg\fa\transition::GREED_LAZY && (!($isinsertion && $transition->from === $transition->to) || $isrecursionend)) {
                         $curstates[] = $newstate;
                     }
                 }
@@ -806,7 +806,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                             $startstates = $this->automaton->get_start_states($transition->pregleaf->number);
                             foreach ($startstates as $state) {
                                 $newnewstate = clone $newstate;
-                                $newnewstate->stack[] = $this->create_fa_exec_stack_item($transition->pregleaf->number, $state, $curpos, $newstate->typos());
+                                $newnewstate->stack[] = $this->create_fa_exec_stack_item($transition->pregleaf->number, $state, $newnewstate, $curpos);
                                 //echo "add recursive state {$newnewstate->state()}\n";
                                 $reached[] = $newnewstate;
                             }
@@ -901,6 +901,24 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
     }
 
+    protected $tranposedstringscache = [];
+    protected function get_tranposed_string($str, $firstcharpos) {
+        $str = is_a($str, '\qtype_poasquestion\utf8_string') ? $str->string() : $str;
+        if (array_key_exists($str, $this->tranposedstringscache) && array_key_exists($firstcharpos, $this->tranposedstringscache[$str])) {
+            return $this->tranposedstringscache[$str][$firstcharpos];
+        }
+
+        $tmp1 = utf8_string::substr($str, $firstcharpos,1);
+        $tmp2 = utf8_string::substr($str, $firstcharpos + 1,1);
+        $strwithtranspose = new utf8_string(utf8_string::substr($str, 0, $firstcharpos) . $tmp2 . $tmp1 . utf8_string::substr($str, $firstcharpos + 2));
+        if (!array_key_exists($str, $this->tranposedstringscache)) {
+            $this->tranposedstringscache[$str] = [];
+        }
+        $this->tranposedstringscache[$str][$firstcharpos] = $strwithtranspose;
+        return $strwithtranspose;
+    }
+
+
     /**
      * This method should be used if there are no backreferences in the regex.
      * Returns array of all possible matches.
@@ -908,7 +926,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
     protected function match_fast($str, $startpos) {
         $maxrecursionlevel = $str->length() + 1;
 
-        $states = array('0' => array()); // Objects of qtype_preg_fa_exec_state. First dimension is recursion level, second is state number.
+        $states = array('R0' => array()); // Objects of qtype_preg_fa_exec_state. First dimension is recursion level, second is state number.
         $curstates = array();          // Indexes of states which the automaton is in at the current wave front. Use stdClass with "recursionlevel" and "state" fields.
         $lazystates = array();         // States (objects!) reached lazily.
         $partialmatches = array();     // Possible partial matches.
@@ -919,7 +937,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         // Create an array of processing states for all fa states (the only initial state, other states are null yet).
         foreach ($this->automaton->get_states() as $curstate) {
-            $states['0'][$curstate] = in_array($curstate, $startstates)
+            $states['R0'][$curstate] = in_array($curstate, $startstates)
                                   ? $this->create_initial_state($curstate, $str, $startpos)
                                   : null;
         }
@@ -927,7 +945,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $reached = array();
 
         // Get an epsilon-closure of the initial state.
-        foreach ($states['0'] as $number => $state) {
+        foreach ($states['R0'] as $number => $state) {
             if ($state !== null) {
                 $reached[$number] = $state;
             }
@@ -936,11 +954,10 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $closure = $this->epsilon_closure($reached, $str, true);
         $lazystates = $closure[\qtype_preg\fa\transition::GREED_LAZY];
         $closure = $closure[\qtype_preg\fa\transition::GREED_GREEDY];
-        $compareonnextstep = [];
 
         foreach ($closure as $state) {
-            $states['0'][$state->state()] = $state;
-            $curstates[] = self::create_index('0', $state->state());
+            $states['R0'][$state->state()] = $state;
+            $curstates[] = self::create_index('R0', $state->state());
             $endstatereached = $endstatereached || $state->is_full();
         }
 
@@ -948,8 +965,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
         // Do search.
         while (!empty($curstates)) {
-            $reached = $compareonnextstep; // $reached uses stdClass with "recursionlevel" and "state" fields as well
-            $compareonnextstep = array();
+            $reached = array(); // $reached uses stdClass with "recursionlevel" and "state" fields as well
             // We'll replace curstates with reached by the end of this loop.
             while (!empty($curstates)) {
                 // Get the current state and iterate over all transitions.
@@ -963,7 +979,9 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                 $recursionlevel = $curstate->recursion_level();
                 $transitions = $this->automaton->get_adjacent_transitions($curstate->state(), true);
 
-                //echo "\n";
+                if ($index->recursionlevel === 'R011' && $curpos === 6 && $index->state == 13) {
+                    $_tmp = 0;
+                }
 
                 foreach ($transitions as $transition) {
                     if ($transition->pregleaf->subtype == qtype_preg_leaf_meta::SUBTYPE_EMPTY
@@ -973,68 +991,128 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
 
                     $length = 0;
                     $full = true;
+                    $to = $transition->to;
+                    if ($to === 12) {
+                        $_tmp = 0;
+                    }
 
                     //$char = core_text::substr($str, $curpos, 1);
                     //echo "level $recursionlevel: trying $transition at pos $curpos (char '$char')\n";
 
                     if ($transition->pregleaf->type === qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL && $recursionlevel < $maxrecursionlevel) {
                         // Handle a recursive transition
-                        $newstate = $this->match_recursive_transition_begin($curstate, $transition, $str, $curpos, $length, $full, true, true, qtype_preg_typo::SUBSTITUTION);
+                        $newstate = $this->match_recursive_transition_begin($curstate, $transition, $str, $curpos, $length, $full, true);
                         if ($full) {
                             $startstates = $this->automaton->get_start_states($transition->pregleaf->number);
                             foreach ($startstates as $state) {
                                 $newnewstate = clone $newstate;
-                                $newnewstate->stack[] = $this->create_fa_exec_stack_item($transition->pregleaf->number, $state, $curpos, $newnewstate->typos());
-                                $index = self::create_index($newnewstate->recursive_calls_sequence(), $newnewstate->state());
-                                self::ensure_index_exists($reached, $index->recursionlevel, $index->state, null);
-                                if ($reached[$index->recursionlevel][$index->state] === null || $newnewstate->leftmost_longest($reached[$index->recursionlevel][$index->state])) {
+                                $newnewstate->stack[] = $this->create_fa_exec_stack_item($transition->pregleaf->number, $state, $newnewstate, $curpos);
+                                $reclevel = $index->recursionlevel[0] === 'T' ? 'T' : 'R';
+                                $idx = self::create_index($reclevel . $newnewstate->recursive_calls_sequence(), $newnewstate->state());
+
+
+                                /*
+                                 *
+                                 self::ensure_index_exists($reached, $idx->recursionlevel, $idx->state, null);
+                                if ($reached[$idx->recursionlevel][$idx->state] === null || $newnewstate->leftmost_longest($reached[$idx->recursionlevel][$idx->state])) {
                                     //echo "add recursive state {$newnewstate->state()} for subexpr {$transition->pregleaf->number}\n";
-                                    $reached[$index->recursionlevel][$index->state] = $newnewstate;
+                                    $reached[$idx->recursionlevel][$idx->state] = $newnewstate;
+                                }*/
+
+                                self::ensure_index_exists($states, $idx->recursionlevel, $idx->state, null);
+                                if ($states[$idx->recursionlevel][$idx->state] === null || $newnewstate->leftmost_longest($states[$idx->recursionlevel][$idx->state])) {
+                                    //echo "add recursive state {$newnewstate->state()} for subexpr {$transition->pregleaf->number}\n";
+                                    $states[$idx->recursionlevel][$idx->state] = $newnewstate;
+                                    $curstates[] = $idx;
                                 }
                             }
                         }
                     } else if ($transition->pregleaf->type !== qtype_preg_node::TYPE_LEAF_SUBEXPR_CALL) {
-                        // Handle a non-recursive transition transition
-                        $newstate = $this->match_regular_transition($curstate, $transition, $str, $curpos, $length, $full, true, true, qtype_preg_typo::SUBSTITUTION);
+                        // Transpose pseudotransitions are implemented as normal matching of string with 2 char transposed
+                        // Prefix 'T' for recursionlevel indicates, that state has successfully consumed single char of 2 char transposed string
+                        // $transitionandtransposeunion stores params, that differs from ordinary matching for transpose transition.
+                        if ($index->recursionlevel[0] === 'T') {
+                            // if it's second part of transpose pseudotransition - let's do normal match with transposed string
+                            $transitionandtransposeunion = [[
+                                'recursionlevel' => 'R' . utf8_string::substr($index->recursionlevel, 1),
+                                'str' => $this->get_tranposed_string($str, $curpos - 1),
+                                'approximate' => false,
+                            ]];
+                        } else if ($curstate->typos()->count() < $this->currentmaxtypos){
+                            // if we can do transpose pseudotransition, let's do normal match with transposed string for first part of transpose pseudotransition
+                            $transitionandtransposeunion = [
+                                ['recursionlevel' => 'R' . utf8_string::substr($index->recursionlevel, 1), 'str' => $str, 'approximate' => true],
+                                ['recursionlevel' => 'T' . utf8_string::substr($index->recursionlevel, 1), 'str' => $this->get_tranposed_string($str, $curpos), 'approximate' => false],
+                            ];
+                        } else {
+                            // otherwise run ordinary match
+                            $transitionandtransposeunion = [
+                                ['recursionlevel' => $index->recursionlevel, 'str' => $str, 'approximate' => true],
+                            ];
+                        }
 
-                        if ($full) {
+                        foreach ($transitionandtransposeunion as $t) {
+                            $s = $t['str'];
+                            $reclevel = $t['recursionlevel'];
+                            $tryapproximate = $t['approximate'];
 
-                            //echo "level $recursionlevel: MATCHED $transition at pos $curpos (char '$char'). length changed {$curstate->length} : {$newstate->length}\n";
-                            //echo $newstate->subpatts_to_string();
+                            // Handle a non-recursive transition transition
+                            $newstate = $this->match_regular_transition(
+                                $curstate,
+                                $transition,
+                                $s,
+                                $curpos,
+                                $length,
+                                $full,
+                                true,
+                                $tryapproximate,
+                                qtype_preg_typo::SUBSTITUTION);
 
-                            // Filter out states that did not start the actual subexpression call.
-                            $skip = !$newstate->is_subexpr_match_started($cursubexpr);
-
-                            $endstatereached = $endstatereached || (!$skip && $newstate->recursion_level() === 0 && $newstate->is_full());
-
-                            // This could be the end of a recursive call.
-                            while (!$skip && $full && $newstate->recursion_level() > 0 && $newstate->is_full()) {
-                                $topitem = array_pop($newstate->stack);
-                                $recursionmatch = $topitem->last_subexpr_match($this->get_options()->mode, $topitem->subexpr);
-                                $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $str, $curpos, $length, $full, true, true, qtype_preg_typo::SUBSTITUTION);
-                                //$newtopitem = end($newstate->stack);
-                                //echo "ended matching of {$topitem->subexpr}, now matching {$newtopitem->subexpr} from state {$newstate->state()}\n";
+                            // If this is first part of transpose transion - add typo
+                            if ($reclevel[0] === 'T') {
+                                $newstate->typos()->add(new qtype_preg_typo(qtype_preg_typo::TRANSPOSITION, $curpos));
                             }
 
-                            $skip = $skip || !$full;
+                            if ($full) {
 
-                            // Save the current result.
-                            if (!$skip) {
-                                if ($transition->greediness == \qtype_preg\fa\transition::GREED_LAZY) {
-                                    $lazystates[] = $newstate;
-                                } else {
-                                    $index = self::create_index($newstate->recursive_calls_sequence(), $newstate->state());
-                                    self::ensure_index_exists($reached, $index->recursionlevel, $index->state, null);
-                                    if ($reached[$index->recursionlevel][$index->state] === null || $newstate->leftmost_longest($reached[$index->recursionlevel][$index->state])) {
-                                        //echo "add state {$newstate->state()}\n";
-                                        $reached[$index->recursionlevel][$index->state] = $newstate;
+                                //echo "level $recursionlevel: MATCHED $transition at pos $curpos (char '$char'). length changed {$curstate->length} : {$newstate->length}\n";
+                                //echo $newstate->subpatts_to_string();
+
+                                // Filter out states that did not start the actual subexpression call.
+                                $skip = !$newstate->is_subexpr_match_started($cursubexpr);
+
+                                $endstatereached = $endstatereached || (!$skip && $newstate->recursion_level() === 0 && $newstate->is_full());
+
+                                // This could be the end of a recursive call.
+                                while (!$skip && $full && $newstate->recursion_level() > 0 && $newstate->is_full()) {
+                                    $topitem = array_pop($newstate->stack);
+                                    $recursionmatch = $topitem->last_subexpr_match($this->get_options()->mode, $topitem->subexpr);
+                                    $newstate = $this->match_recursive_transition_end($newstate, $topitem->recursionstartpos, $recursionmatch[1], $s, $curpos, $length, $full, true);
+                                    $reclevel = ($reclevel[0] === 'T' ? 'T' : 'R') . $newstate->recursive_calls_sequence();
+                                }
+
+                                $skip = $skip || !$full;
+
+                                // Save the current result.
+                                if (!$skip) {
+                                    if ($transition->greediness == \qtype_preg\fa\transition::GREED_LAZY) {
+                                        if ($reclevel[0] !== 'T') {
+                                            $lazystates[] = $newstate;
+                                        }
+                                    } else {
+                                        $idx = self::create_index($reclevel, $newstate->state());
+                                        self::ensure_index_exists($reached, $idx->recursionlevel, $idx->state, null);
+                                        if ($reached[$idx->recursionlevel][$idx->state] === null || $newstate->leftmost_longest($reached[$idx->recursionlevel][$idx->state])) {
+                                            //echo "add state {$newstate->state()}\n";
+                                            $reached[$idx->recursionlevel][$idx->state] = $newstate;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
 
-                    if (!$full && !$endstatereached) {
+                    if (!$full && !$endstatereached && $index->recursionlevel[0] !== 'T') {
                         // Handle a partial match. Partial match shouldn't contain any typos at the end of the match.
                         $pos = $newstate->startpos + $newstate->length;
                         if (!$newstate->typos()->contains(qtype_preg_typo::INSERTION, $pos)
@@ -1042,7 +1120,7 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                             && !$newstate->typos()->contains(qtype_preg_typo::DELETION, $pos - 1)) {
                             $partialmatches[] = $newstate;
                         }
-                    } elseif ($full && !$endstatereached
+                    } elseif ($full && !$endstatereached && $index->recursionlevel[0] !== 'T'
                         && $newstate->typos()->count(qtype_preg_typo::SUBSTITUTION) > $curstate->typos()->count(qtype_preg_typo::SUBSTITUTION)) {
                         // Handle a partial match when last state consumed char with substitution pseudo-transition.
                         $pos = $curstate->startpos + $curstate->length;
@@ -1054,46 +1132,14 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
                     }
                 }
 
-                // Try transpose pseudotransitions.
-                if ($this->options->mergeassertions
-                    && $curerrcount < $this->currentmaxtypos
-                    && $curpos < $str->length() - 1
-                    && !$this->is_char_in_lang_typo_blacklist($str[$curpos])
-                    && !$this->is_char_in_lang_typo_blacklist($str[$curpos + 1])) {
-                    $tmp1 = $str[$curpos];
-                    $tmp2 = $str[$curpos + 1];
-                    if (strcmp($tmp1, $tmp2) !== 0) {
-                        $str[$curpos + 1] = $tmp1;
-                        $str[$curpos] = $tmp2;
-                        foreach ($this->transposepseudotransitions[$from] as $to => $transitions) {
-                            if (isset($reached[$recursionlevel][$to]) && $reached[$recursionlevel][$to]->typos()->count() < $curerrcount) {
-                                continue;
-                            }
-
-                            foreach ($transitions as $tr) {
-                                $newstate = $this->match_transitions($curstate, $tr, $str, $curpos, $length, $full, true, true, false);
-                                if ($full) {
-                                    $newstate->typos()->add(new qtype_preg_typo(qtype_preg_typo::TRANSPOSITION, $curpos));
-                                    $index = self::create_index($newstate->recursive_calls_sequence(), $newstate->state());
-                                    self::ensure_index_exists($compareonnextstep, $index->recursionlevel, $index->state, null);
-                                    if ($compareonnextstep[$index->recursionlevel][$index->state] === null || $newstate->leftmost_longest($compareonnextstep[$index->recursionlevel][$index->state])) {
-                                        $compareonnextstep[$index->recursionlevel][$index->state] = $newstate;
-                                    }
-                                }
-                            }
-                        }
-                        $str[$curpos + 1] = $tmp2;
-                        $str[$curpos] = $tmp1;
-                    }
-                }
-
                 // Try to deletion pseudotransition.
-                if ($curerrcount < $this->currentmaxtypos) {
+                if ($curerrcount < $this->currentmaxtypos && $index->recursionlevel[0] !== 'T') {
                     $newstate = $this->match_deletion_pseudotransitions($curstate, $curpos);
                     if ($newstate !== null) {
-                        self::ensure_index_exists($reached, $recursionlevel, $from, null);
-                        if ($reached[$recursionlevel][$from] === null || $newstate->leftmost_longest($reached[$recursionlevel][$from])) {
-                            $reached[$recursionlevel][$from] = $newstate;
+                        $recursionlevelstr = "R$recursionlevel";
+                        self::ensure_index_exists($reached, $recursionlevelstr, $from, null);
+                        if ($reached[$recursionlevelstr][$from] === null || $newstate->leftmost_longest($reached[$recursionlevelstr][$from])) {
+                            $reached[$recursionlevelstr][$from] = $newstate;
                         }
                     }
                 }
@@ -1102,26 +1148,34 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
             // If there's no full match yet and no states reached, try the lazy ones.
             if (!$endstatereached && empty($reached) && !empty($lazystates)) {
                 $lazy = array_pop($lazystates);
-                $index = self::create_index($lazy->recursive_calls_sequence(), $lazy->state());
+                $index = self::create_index('R' . $lazy->recursive_calls_sequence(), $lazy->state());
                 self::ensure_index_exists($reached, $index->recursionlevel, $index->state, null);
                 $reached[$index->recursionlevel][$index->state] = $lazy;
             }
 
             // Iterate over reached states. Get epsilon-closure for each recursion level.
             foreach ($reached as $recursionlevel => $reachedforlevel) {
+                if ($recursionlevel[0] === 'T') {
+                    continue;
+                }
+                if ($recursionlevel === 'R011') {
+                    $_tmp = 0;
+                }
+
                 $reached[$recursionlevel] = $this->epsilon_closure($reachedforlevel, $str, true);
                 $lazystates = array_merge($lazystates, $reached[$recursionlevel][\qtype_preg\fa\transition::GREED_LAZY]);
                 $reached[$recursionlevel] = $reached[$recursionlevel][\qtype_preg\fa\transition::GREED_GREEDY];
             }
 
-            foreach ($reached as $newstates) {
+            foreach ($reached as $reclevel => $newstates) {
+                $reclevelprefix = $reclevel[0] === 'T' ? 'T' : 'R';
                 foreach ($newstates as $newstate) {
                     $errorscount = $newstate->typos()->count();
                     if ($errorscount > $this->currentmaxtypos) {
                        continue;
                     }
 
-                    $index = self::create_index($newstate->recursive_calls_sequence(), $newstate->state());
+                    $index = self::create_index($reclevelprefix . $newstate->recursive_calls_sequence(), $newstate->state());
                     self::ensure_index_exists($states, $index->recursionlevel, $index->state, null);
                     if ($states[$index->recursionlevel][$index->state] === null ||
                             $newstate->leftmost_longest($states[$index->recursionlevel][$index->state], true, $newstate->recursion_level() === 0 && $newstate->is_full())) {
@@ -1148,8 +1202,8 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         // Return array of all possible matches.
         $result = array();
         foreach ($this->automaton->get_end_states(0) as $endstate) {
-            if ($states['0'][$endstate] !== null) {
-                $result[] = $states['0'][$endstate];
+            if ($states['R0'][$endstate] !== null) {
+                $result[] = $states['R0'][$endstate];
             }
         }
         if (empty($result)) {
@@ -1460,28 +1514,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         }
     }
 
-    protected function calculate_transpose_pseudotransitions() {
-        foreach ($this->automaton->get_states() as $state) {
-            foreach ($this->automaton->get_adjacent_transitions($state) as $tr1) {
-                if ($tr1->pregleaf->type != qtype_preg_node::TYPE_LEAF_CHARSET) {
-                    continue;
-                }
-                foreach ($this->automaton->get_adjacent_transitions($tr1->to) as $tr2) {
-                    if ($tr2->pregleaf->type != qtype_preg_node::TYPE_LEAF_CHARSET) {
-                        continue;
-                    }
-                    $transitions1 = array_merge($tr1->mergedbefore, array($tr1), $tr1->mergedafter);
-                    $transitions2 = array_merge($tr2->mergedbefore, array($tr2), $tr2->mergedafter);
-                    $this->transposepseudotransitions[$state][$tr2->to] []= array_merge($transitions1, $transitions2);
-                }
-            }
-
-            if (!isset($this->transposepseudotransitions[$state])) {
-                $this->transposepseudotransitions[$state] = [];
-            }
-        }
-    }
-
     public function __construct($regex = null, $options = null) {
         global $CFG;
 
@@ -1528,10 +1560,6 @@ class qtype_preg_fa_matcher extends qtype_preg_matcher {
         $this->calculate_nesting_map($this->astroot, array($this->astroot->subpattern));
         $this->calculate_backtrackstates();
         $this->calculate_bruteforce();
-
-        if ($options->approximatematch && $options->mergeassertions && empty($this->errors)) {
-            $this->calculate_transpose_pseudotransitions();
-        }
 
         if ($options->langid) {
             $this->langobj = \block_formal_langs::lang_object($options->langid);

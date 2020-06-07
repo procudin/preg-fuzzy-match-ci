@@ -36,8 +36,11 @@ class qtype_preg_fa_stack_item {
     // Position where recursion was started.
     public $recursionstartpos;
 
-    // The corresponding fa state.
+    // The corresponding fa state number.
     public $state;
+
+    // The corresponding fa state object.
+    public $stateobj;
 
     // Is the match full.
     public $full;
@@ -53,9 +56,6 @@ class qtype_preg_fa_stack_item {
     // Each subpattern is initialized with (-1,-1) at start.
     public $approximatematches;
 
-    // Object of qtype_preg_typo_container, containing all encountered typos.
-    public $typos;
-
     // Array used mostly for disambiguation when there are duplicate subpexpressions numbers.
     // Keys are subexpr numbers, values are qtype_preg_node objects.
     public $subexpr_to_subpatt;
@@ -68,10 +68,6 @@ class qtype_preg_fa_stack_item {
 
     // Was the last transition matched partially? E.g. backreference, or a few merged transitions
     public $last_match_is_partial;
-
-    public function __clone() {
-        $this->typos = clone $this->typos;
-    }
 
     public function current_match($subpatt) {
         return isset($this->matches[$subpatt]) ? end($this->matches[$subpatt]) : null;
@@ -94,7 +90,7 @@ class qtype_preg_fa_stack_item {
             return;
         }
         $count = count($this->approximatematches[$subpatt]);
-        $insertions = $this->typos->count(qtype_preg_typo::INSERTION);
+        $insertions = $this->stateobj->typos()->count(qtype_preg_typo::INSERTION);
         if ($afterinsertion) {
             --$insertions;
         }
@@ -106,7 +102,7 @@ class qtype_preg_fa_stack_item {
             return;
         }
         $count = count($this->approximatematches[$subpatt]);
-        $this->approximatematches[$subpatt][$count - 1] = array($this->approximatematches[$subpatt][$count - 1][0], $length + $this->typos->count(qtype_preg_typo::INSERTION) - $this->approximatematches[$subpatt][$count - 1][2], $this->approximatematches[$subpatt][$count - 1][2]);
+        $this->approximatematches[$subpatt][$count - 1] = array($this->approximatematches[$subpatt][$count - 1][0], $length + $this->stateobj->typos()->count(qtype_preg_typo::INSERTION) - $this->approximatematches[$subpatt][$count - 1][2], $this->approximatematches[$subpatt][$count - 1][2]);
     }
 
     protected function last_match_inner($mode, $subpatt, $isapproximate) {
@@ -345,8 +341,12 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
     // States to backtrack to when generating extensions of partial matches.
     public $backtrack_states;
 
+    // Object of qtype_preg_typo_container, containing all encountered typos.
+    public $typos;
+
     public function __clone() {
         $this->str = clone $this->str;  // Needs to be cloned for correct string generation.
+        $this->typos = clone $this->typos;
         foreach ($this->stack as $key => $item) {
             $this->stack[$key] = clone $item;
         }
@@ -372,8 +372,7 @@ class qtype_preg_fa_exec_state implements qtype_preg_matcher_state {
     }
 
     public function typos() {
-        $end = end($this->stack);
-        return $end->typos;
+        return $this->typos;
     }
 
     public function recursion_level() {
